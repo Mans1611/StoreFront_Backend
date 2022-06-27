@@ -8,8 +8,9 @@ dotenv.config();
 export type product_type = {
     id?:Number
     name:String
-    price:Number
-    category?:String // since it is optional 
+    price?:Number
+    category?:String // since it is optional
+    quantity?:Number 
 }
 
 export default class Products{
@@ -38,7 +39,6 @@ export default class Products{
             else {
                 return 'this product is not exist';
             }
-
         }catch(err){
             console.log(err);
             return "you have an error in show method";
@@ -61,6 +61,15 @@ export default class Products{
 
     }
 
+    async popularProducts():Promise <product_type[]>{
+        const sqlCommand = `SELECT name,SUM(product_quantity) FROM Products INNER JOIN Orders ON Products.product_id=Orders.product_id GROUP BY (Orders.product_id,Products.name) ORDER BY SUM(product_quantity) DESC`;
+        //const sqlCommand_2 = `SELECT  product_id,SUM(product_quantity) FROM Orders GROUP BY product_id ORDER BY SUM(product_quantity) DESC`;
+        const connection = await client.connect();
+        const result = await connection.query(sqlCommand);
+        return result.rows;
+    }
+
+
     async category(cat:string):Promise<product_type[] | string>{
         const sqlCommand = `SELECT * FROM Products WHERE category=($1)`;
         try{
@@ -76,7 +85,25 @@ export default class Products{
             console.log(err);
             return 'an error occurd'
         }
+    }
 
+    async deleteProduct(id:String):Promise <string>{
+        const sqlCommand_1 = `DELETE FROM Orders WHERE product_id=($1)`;
+        const sqlCommand_2 = `DELETE FROM Products WHERE product_id=($1)`;
+        try{
+            const connection = await client.connect();
+            const result = await connection.query('SELECT * FROM Products WHERE product_id=($1)',[id]);
+            // the consition below is to check wheater this id of this product exist in the database or not 
+            if(result.rowCount > 0){
+                await connection.query(sqlCommand_1,[id]);
+                await connection.query(sqlCommand_2,[id]);
+                return 'The product is deleted';
+            }
+            return ' this product is not exist';
+        }catch(err){
+            console.log(err);
+            return 'an error occured while removing this product'
+        }
     }
 
 }

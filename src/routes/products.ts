@@ -17,16 +17,24 @@ products.get('/show/:id',tokenVerify,async(req:Request,res:Response)=>{
 })
 
 
-products.post('/create',tokenVerify,async (req:Request,res:Response)=>{
-    const result = await product.create(req);
-    res.send(result);
-})
-
-
-
 products.get('/category/:cat',async(req:Request,res:Response)=>{
     const result = await product.category(req.params.cat);
     res.send(result);
+})
+
+products.get('/popularProducts',async (req:Request,res:Response)=>{
+    const result = await product.popularProducts();
+    res.send(result)
+})
+
+products.post('/create',tokenVerify,async (req:Request,res:Response)=>{
+    const result = await product.create(req);
+    res.status(201).send(result);
+})
+
+products.delete('/deleteProduct/:id',async (req:Request,res:Response)=>{
+    const result = await product.deleteProduct(req.params.id);
+    res.status(200).send(result);
 })
 
 export default products;
