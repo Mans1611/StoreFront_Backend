@@ -5,17 +5,27 @@ const products = express.Router();
 
 
 const product = new Products();
-products.get('/show',async (req:express.Request,res:express.Response)=>{
+products.get('/index',tokenVerify,async (req:express.Request,res:express.Response)=>{
     const result = await product.index();
     res.send(result);
 })
+
 products.get('/show/:id',tokenVerify,async(req:Request,res:Response)=>{
     console.log(req.params.id);
     const result = await product.show(req.params.id);
     res.send(result);
 })
+
+
 products.post('/create',tokenVerify,async (req:Request,res:Response)=>{
     const result = await product.create(req);
+    res.send(result);
+})
+
+
+
+products.get('/category/:cat',async(req:Request,res:Response)=>{
+    const result = await product.category(req.params.cat);
     res.send(result);
 })
 

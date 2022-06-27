@@ -8,9 +8,11 @@ const tokenVerify = (req:Request,res:Response,next:Function)=>{
     res.send("provide a token");
     }else{
         try{
-            const verify = jwt.verify(req.headers.token as string , process.env.jwt as string);
-            console.log("passed");
+            const verify = jwt.verify(req.headers.token as string, process.env.jwt as string);
+            req.headers.payload = JSON.stringify(verify); // i sent the payload of the token as a header proprty and i pass it as a string 
+            
             next();
+
         }catch(err){
             console.log(err);
             res.send("the token is not valid")

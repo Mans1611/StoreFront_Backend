@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import express from 'express';
-import oreders from './routes/orders';
+import orders from './routes/orders';
 import products from './routes/products';
 import users from './routes/users';
 
@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded())
 // routes middleware  
 app.use('/products',products);
 app.use('/users',users);
-app.use('/orders',oreders);
+app.use('/orders',orders);
 
 app.get('/',(req,res)=>{
     res.send("hello mansour");

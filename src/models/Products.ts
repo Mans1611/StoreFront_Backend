@@ -22,14 +22,14 @@ export default class Products{
             return result.rows;
         }catch(err){
             console.log(err);
-            return "you have an error";
+            return "you have an error in index";
         }
     }
 
     async show(id:string):Promise<product_type | string>{
         try{
             const connection = await client.connect();
-            const sqlCommand = `SELECT * FROM Products WHERE id=($1);`;
+            const sqlCommand = `SELECT * FROM Products WHERE user_id=($1);`;
             const result = await connection.query(sqlCommand,[id]);
             
             // this conditoin for checking if the product is exist or not
@@ -45,7 +45,7 @@ export default class Products{
         }
     }
 
-    
+
     async create(req:Request):Promise<string> {
         const sqlCommand = `INSERT INTO Products (name,price,category) VALUES($1,$2,$3);`;
         try{
@@ -58,6 +58,24 @@ export default class Products{
             return 'there is an error';
         }
 
+
+    }
+
+    async category(cat:string):Promise<product_type[] | string>{
+        const sqlCommand = `SELECT * FROM Products WHERE category=($1)`;
+        try{
+            const connection = await client.connect();
+            const result = await connection.query(sqlCommand,[cat]);
+            
+            if(result.rowCount>0)
+                return result.rows;
+            else{
+                return 'this category is not found'
+            }
+        }catch(err){
+            console.log(err);
+            return 'an error occurd'
+        }
 
     }
 
