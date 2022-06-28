@@ -20,6 +20,7 @@ export default class Products{
             const connection = await client.connect();
             const sqlCommand = `SELECT * FROM Products;`;
             const result = await connection.query(sqlCommand);
+            connection.release();
             return result.rows;
         }catch(err){
             console.log(err);
@@ -30,10 +31,11 @@ export default class Products{
     async show(id:string):Promise<product_type | string>{
         try{
             const connection = await client.connect();
-            const sqlCommand = `SELECT * FROM Products WHERE user_id=($1);`;
+            const sqlCommand = `SELECT * FROM Products WHERE product_id=($1);`;
             const result = await connection.query(sqlCommand,[id]);
             
             // this conditoin for checking if the product is exist or not
+            connection.release();
             if(result.rowCount>0)
                 return result.rows[0];
             else {
@@ -46,27 +48,27 @@ export default class Products{
     }
 
 
-    async create(req:Request):Promise<string> {
+    async create(product:product_type):Promise<string> {
         const sqlCommand = `INSERT INTO Products (name,price,category) VALUES($1,$2,$3);`;
         try{
             const connection = await client.connect();
-            const {name,price,category} = req.body;
+            const {name,price,category} = product;
             await connection.query(sqlCommand,[name,price,category]);
+            connection.release();
             return 'done';
         }catch(err){
             console.log(err);
             return 'there is an error';
         }
-
-
     }
 
-    async popularProducts():Promise <product_type[]>{
-        const sqlCommand = `SELECT name,SUM(product_quantity) FROM Products INNER JOIN Orders ON Products.product_id=Orders.product_id GROUP BY (Orders.product_id,Products.name) ORDER BY SUM(product_quantity) DESC`;
-        //const sqlCommand_2 = `SELECT  product_id,SUM(product_quantity) FROM Orders GROUP BY product_id ORDER BY SUM(product_quantity) DESC`;
+    async popularProducts():Promise <product_type[] | string>{
+        const sqlCommand = `SELECT name,SUM(product_quantity) AS quantity FROM Products INNER JOIN Orders ON Products.product_id=Orders.product_id GROUP BY (Orders.product_id,Products.name) ORDER BY SUM(product_quantity) DESC LIMIT 5`;
         const connection = await client.connect();
         const result = await connection.query(sqlCommand);
-        return result.rows;
+       if(result.rowCount>1)
+            return result.rows;
+        return 'There is no orders yet '
     }
 
 
@@ -75,6 +77,7 @@ export default class Products{
         try{
             const connection = await client.connect();
             const result = await connection.query(sqlCommand,[cat]);
+            connection.release();
             
             if(result.rowCount>0)
                 return result.rows;
@@ -85,6 +88,41 @@ export default class Products{
             console.log(err);
             return 'an error occurd'
         }
+    }
+
+    async updateProduct(req:Request):Promise<string>{
+        try{
+            const connection = await client.connect();
+            const user = await this.show(req.params.id);
+            if(typeof(user)==='string')
+                return 'this item is not found';
+
+            if(req.body.name!==''){
+                const sqlCommand = `UPDATE Products SET name=($1) WHERE product_id=($2)`;
+                await connection.query(sqlCommand,[req.body.name,req.params.id]) ;
+            }
+            
+            if(req.body.price!==''){
+                const price = parseInt(req.body.price); // this to make sure it is a number as in the database
+                const sqlCommand = `UPDATE Products SET price=($1) WHERE product_id=($2)`;
+                await connection.query(sqlCommand,[price,req.params.id]) ;
+            }
+            if(req.body.category!==''){
+                const sqlCommand = `UPDATE Products SET category=($1) WHERE product_id=($2)`;
+                await connection.query(sqlCommand,[req.body.category,req.params.id]);
+            }
+            connection.release();
+            return 'updating prodct is done'
+               
+              
+            
+        }catch(err){
+            console.log(err);
+            return 'error while updating processs';
+            
+        }
+
+            
     }
 
     async deleteProduct(id:String):Promise <string>{
@@ -99,6 +137,7 @@ export default class Products{
                 await connection.query(sqlCommand_2,[id]);
                 return 'The product is deleted';
             }
+            connection.release();
             return ' this product is not exist';
         }catch(err){
             console.log(err);

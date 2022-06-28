@@ -1,10 +1,11 @@
 import client from "../Client";
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 import { Request,Response } from "express";
 import { order_type } from "./Order";
 export type user_type = {
-    id?:Number,
+    user_id?:Number,
     firstname:String,
     lastname:String,
     password?:String
@@ -19,8 +20,9 @@ export default class User {
     async index():Promise<user_type[] | string >{
         try{
             const connection = await client.connect();
-            const sqlCommand = `SELECT user_id,firstname,lastname FROM Users;`
+            const sqlCommand = `SELECT * FROM Users;`
             const result = await connection.query(sqlCommand);
+            connection.release();
             return result.rows;
         }catch(err){
             console.log(err);
@@ -33,7 +35,11 @@ export default class User {
         try{
             const connection = await client.connect();
             const result = await connection.query(sqlCommand,[id]);
-            return result.rows[0];
+            connection.release();
+            if(result.rowCount>0)
+                return result.rows[0];
+            
+            return `this user is not found` ;
         }catch(err){
             console.log(err);
             return 'there is an error'
@@ -42,13 +48,14 @@ export default class User {
 
     async completeOrder(req:Request):Promise <order_type[] | string>{
         const connection = await client.connect();
+        
         try{
              const user = await this.show(req.params.id);
              const payload = JSON.parse(req.headers.payload as string);
              if(typeof(user)==='string')
                 return 'this user is not Found';
             
-             if((user.firstname !== payload.firstName) || (user.lastname !== payload.lastName))
+             if( user.user_id != payload.user_id )
                 return 'this token is not for this user id';
 
         }
@@ -59,6 +66,7 @@ export default class User {
         try{
             const sqlCommand = `SELECT name,Orders.product_id,status FROM Orders INNER JOIN Products ON Products.product_id=Orders.product_id  WHERE user_id=($1) AND status='Complete'`;
             const result = await connection.query(sqlCommand,[req.params.id])
+            connection.release();
             if(result.rowCount>0)
                 return result.rows;
             return 'this user has no complete orders';
@@ -73,11 +81,11 @@ export default class User {
     async create(user:user_type):Promise<string>{
         try{console.log(process.env.salt);
             const salt = parseInt(process.env.salt as string);
-
             const hashedPass = bcrypt.hashSync(user.password as string ,salt);
             const connection = await client.connect();
             const sqlCommand = `INSERT INTO Users (firstName,lastName,password) VALUES($1,$2,$3)`;
             await connection.query(sqlCommand,[user.firstname,user.lastname,hashedPass]);
+            connection.release();
             return "user is created"
         }catch(err){
             console.log(err);
@@ -85,9 +93,59 @@ export default class User {
         }
 
     }
+
+    async updateUser(req:Request):Promise<string>{
+        try{
+            const connection = await client.connect();
+            const user = await this.show(req.params.id);
+           
+
+            // this condition to avoid the error message from show method
+            if(typeof(user)==='string')
+                return 'this user dosnt exist '
+            const payload = JSON.parse(req.headers.payload as string );
+            
+            // this below condition is to verify the payload from the token provided 
+            if( payload.user_id != user.user_id )
+               return 'the token is not for this user';
+            
+            /* the next 3 conditions for giving the user the flexiability to update the wanted feilds
+               not all the fields  
+            */ 
+
+            if(req.body.firstname!==''){
+                const sqlCommand = `UPDATE Users SET firstname=($1) WHERE user_id=($2)`;
+                const result = await connection.query(sqlCommand,[req.body.firstname,req.params.id]) ;
+
+            }
+            if(req.body.lastname!==''){
+                const sqlCommand = `UPDATE Users SET lastname=($1) WHERE user_id=($2)`;
+                const result = await connection.query(sqlCommand,[req.body.lastname,req.params.id]) ;
+            }
+            if(req.body.password!==''){
+                const sqlCommand = `UPDATE Users SET password=($1) WHERE user_id=($2)`;
+                // we need to crypt the password before updating it 
+                const newPass = bcrypt.hashSync(req.body.password,process.env.salt as string);
+                const result = await connection.query(sqlCommand,[newPass,req.params.id]);
+            }
+            connection.release();
+            return 'updating is over'
+               
+              
+            
+        }catch(err){
+            console.log(err);
+            return 'error while updating processs';
+            
+        }
+
+            
+    }
+
+
     async deleteUser(req:Request):Promise<string>{
 
-
+        // since the relation between orders and users so it is must be deleted from both
         const sqlCommand_1 = `DELETE FROM Orders WHERE user_id=($1)`;
         const sqlCommand_2 = 'DELETE FROM Users WHERE user_id=($1)';
         
@@ -97,7 +155,7 @@ export default class User {
             const payload = JSON.parse(req.headers.payload as string);
 
             if(result.rowCount>0){
-                if(result.rows[0].firstname===payload.firstName && result.rows[0].lastname===payload.lastName){
+                if(result.rows[0].user_id == payload.user_id){
                     await connection.query(sqlCommand_2,[req.params.id]);
                     await connection.query(sqlCommand_1,[req.params.id]);
                     return 'This user is deleted'
@@ -105,6 +163,7 @@ export default class User {
                     return 'check this token agian for this user';
                 }
             }
+            connection.release();
             return 'This user is not exist to delete';
 
         }catch(err){

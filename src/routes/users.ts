@@ -17,15 +17,17 @@ users.get('/index', tokenVerify,async (req:Request,res:Response)=>{
 
 users.get('/show/:id',tokenVerify,async(req:Request,res:Response)=>{
     const result = await user.show(req.params.id);
+    console.log(result);
+    
     if(typeof(result) === 'string' ){
-        res.send("this user is exist")
-    }else{
+        res.status(404).send("this user is not exist")
+    }
+    else{
         const payload = JSON.parse(req.headers.payload as string);
-        
-        
-        if(payload.firstName === result.firstname && payload.lastName === result.lastname)
+
+        if(payload.user_id === result.user_id)
             res.status(200).send(result);
-        else{
+            else{
             // if the user data in the database do not match the one in the token
             res.status(404).send("Check the token again"); 
         }
@@ -44,8 +46,23 @@ users.post('/create',async (req:Request,res:Response)=>{
     try{
         const result = await user.create((req.body as unknown) as user_type); 
         // so if it passes from the above line so this means that the user is created, and we need token for this.user;
-        const token = jwt.sign({firstName:req.body.firstname,lastName:req.body.lastname},process.env.jwt as string);    
+        const  connection = await client.connect();
+        
+        /* 
+           the code below is to provide the id of the the user which was created
+           in the token, this will help me to check for another authorization end points
+        */
+        const users =  (await connection.query('SELECT user_id FROM users')).rows;
+        const {user_id} = users[users.length-1];  
+        const token = jwt.sign(
+            {
+                firstName:req.body.firstname,
+                lastName:req.body.lastname,
+                user_id},process.env.jwt as string);
+
         res.setHeader("tokenvalue",token); // i sent the token value in response header. 
+        
+        
         res.status(201).send(result);
     }catch(err){
         console.log(err);
@@ -53,9 +70,13 @@ users.post('/create',async (req:Request,res:Response)=>{
     }
     
 })
+users.put('/update/:id',tokenVerify,async(req:Request,res:Response)=>{
+    const result = await user.updateUser(req);
+    res.send(result);
+})
+
 users.delete('/delete/:id',tokenVerify,async (req:Request,res:Response)=>{
     try{    
-        console.log(req.headers.payload)
         const result = await user.deleteUser(req);
         res.status(200).send(result)
     }

@@ -28,10 +28,13 @@ products.get('/popularProducts',async (req:Request,res:Response)=>{
 })
 
 products.post('/create',tokenVerify,async (req:Request,res:Response)=>{
-    const result = await product.create(req);
+    const result = await product.create(req.body);
     res.status(201).send(result);
 })
-
+products.put('/update/:id',async(req:Request,res:Response)=>{
+    const result = await product.updateProduct(req);
+    res.send(result)
+})
 products.delete('/deleteProduct/:id',async (req:Request,res:Response)=>{
     const result = await product.deleteProduct(req.params.id);
     res.status(200).send(result);

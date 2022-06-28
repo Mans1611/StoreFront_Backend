@@ -12,22 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Users_1 = __importDefault(require("../models/Users"));
-const user = new Users_1.default();
-describe("testing users routes", () => {
-    it("defenition", () => {
-        expect(user).toBeDefined();
-    });
-    it("testing index", () => __awaiter(void 0, void 0, void 0, function* () {
-        const index = yield user.index();
-        expect(index).toEqual(index);
-    }));
-    it('testing creating new user ', () => __awaiter(void 0, void 0, void 0, function* () {
-        const newUser = yield user.create({
-            firstname: "ahmed",
-            lastname: "Ali",
-            password: "mansour"
-        });
-        expect(newUser).toEqual('user is created');
-    }));
-});
+const express_1 = __importDefault(require("express"));
+const tokenVerify_1 = __importDefault(require("../middleware/tokenVerify"));
+const Order_1 = __importDefault(require("../models/Order"));
+const orders = express_1.default.Router();
+const order = new Order_1.default();
+orders.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order.getAll();
+    res.send(result);
+}));
+orders.get('/currentOrder/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order.currentOrder(req);
+    res.send(result);
+}));
+orders.post('/create/:user_id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order.createOrder(Object.assign(Object.assign({}, req.body), req.params));
+    res.send(result);
+}));
+exports.default = orders;

@@ -12,22 +12,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Users_1 = __importDefault(require("../models/Users"));
-const user = new Users_1.default();
-describe("testing users routes", () => {
-    it("defenition", () => {
-        expect(user).toBeDefined();
+const Order_1 = __importDefault(require("../models/Order"));
+const server_1 = __importDefault(require("../server"));
+const supertest_1 = __importDefault(require("supertest"));
+const request = (0, supertest_1.default)(server_1.default);
+const order = new Order_1.default();
+describe('Testing orders', () => {
+    it("testing order defenition", () => {
+        expect(order).toBeDefined();
     });
-    it("testing index", () => __awaiter(void 0, void 0, void 0, function* () {
-        const index = yield user.index();
-        expect(index).toEqual(index);
-    }));
-    it('testing creating new user ', () => __awaiter(void 0, void 0, void 0, function* () {
-        const newUser = yield user.create({
-            firstname: "ahmed",
-            lastname: "Ali",
-            password: "mansour"
-        });
-        expect(newUser).toEqual('user is created');
+    it("create new order", () => __awaiter(void 0, void 0, void 0, function* () {
+        let test_order = {
+            user_id: '4',
+            product_id: '7',
+            product_quantity: 1,
+            status: "Active"
+        };
+        // const server = await request.post('/orders/create/7');
+        const res = yield order.createOrder(test_order);
+        expect(res).toBe("Order is created ");
     }));
 });

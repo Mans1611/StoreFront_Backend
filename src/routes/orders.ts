@@ -8,10 +8,14 @@ orders.get('/',async (req,res)=>{
     const result = await order.getAll();
     res.send(result)
 })
+orders.get('/currentOrder/:id',tokenVerify,async (req:express.Request,res:express.Response)=>{
+    const result = await order.currentOrder(req);
+    res.send(result)
+})
 
-orders.post('/currentOrder/:user_id',tokenVerify,async(req:express.Request,res:express.Response)=>{
-    const result = await order.currentOrder({...req.body,...req.params});
-    res.send("created");
+orders.post('/create/:user_id',tokenVerify,async(req:express.Request,res:express.Response)=>{
+    const result = await order.createOrder({...req.body,...req.params});
+    res.send(result);
     
 })
 
