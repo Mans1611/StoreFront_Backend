@@ -3,10 +3,12 @@ import express from 'express';
 import orders from './routes/orders';
 import products from './routes/products';
 import users from './routes/users';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
 const app = express();
-const Port = 5000;
+const Port = process.env.PORT;
 app.use(bodyParser.urlencoded());
 // routes middleware  
 app.use('/products',products);

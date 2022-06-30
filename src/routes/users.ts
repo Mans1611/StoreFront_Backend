@@ -1,5 +1,5 @@
 import express ,{Request,Response} from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import User, { user_type } from '../models/Users';
 import dotenv from 'dotenv';
 import tokenVerify from '../middleware/tokenVerify';
@@ -16,9 +16,7 @@ users.get('/index', tokenVerify,async (req:Request,res:Response)=>{
 })
 
 users.get('/show/:id',tokenVerify,async(req:Request,res:Response)=>{
-    const result = await user.show(req.params.id);
-    console.log(result);
-    
+    const result = await user.show(req.params.id); 
     if(typeof(result) === 'string' ){
         res.status(404).send("this user is not exist")
     }

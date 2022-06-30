@@ -5,13 +5,15 @@ const products = express.Router();
 
 
 const product = new Products();
+products.get('/',(req:Request,res:Response)=>{
+    res.status(200).send("Products Section");
+})
 products.get('/index',tokenVerify,async (req:express.Request,res:express.Response)=>{
     const result = await product.index();
     res.send(result);
 })
 
 products.get('/show/:id',tokenVerify,async(req:Request,res:Response)=>{
-    console.log(req.params.id);
     const result = await product.show(req.params.id);
     res.send(result);
 })

@@ -1,16 +1,19 @@
 {
+    "defaultENV":{"ENV": "NODE_ENV"},
+
     "dev": {
       "driver": "pg",
-      "host": "127.0.0.1",
-      "database": "postgres",
-      "user": "postgres",
-      "password": "samsungs6"
+      "host": {"ENV":"POSTG_HOST"},
+      "database": {"ENV" : "database"},
+      "user": { "ENV" : "user"},
+      "password": {"ENV" : "pass"}
     },
+    
     "test": {
       "driver": "pg",
-      "host": "127.0.0.1",
-      "database": "test",
-      "user": "postgres",
-      "password": "samsungs6"
+      "host":{"ENV" : "POSTG_HOST"} ,
+      "database":{"ENV" : "database_test"},
+      "user": {"ENV" : "user"},
+      "password": {"ENV" : "pass"}
     }
-  }
+}

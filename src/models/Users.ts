@@ -79,7 +79,8 @@ export default class User {
 
 
     async create(user:user_type):Promise<string>{
-        try{console.log(process.env.salt);
+        try{
+           
             const salt = parseInt(process.env.salt as string);
             const hashedPass = bcrypt.hashSync(user.password as string ,salt);
             const connection = await client.connect();

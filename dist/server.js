@@ -8,8 +8,10 @@ const express_1 = __importDefault(require("express"));
 const orders_1 = __importDefault(require("./routes/orders"));
 const products_1 = __importDefault(require("./routes/products"));
 const users_1 = __importDefault(require("./routes/users"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const app = (0, express_1.default)();
-const Port = 5000;
+const Port = process.env.PORT;
 app.use(body_parser_1.default.urlencoded());
 // routes middleware  
 app.use('/products', products_1.default);

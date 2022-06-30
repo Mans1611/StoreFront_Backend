@@ -29,4 +29,8 @@ orders.post('/create/:user_id', tokenVerify_1.default, (req, res) => __awaiter(v
     const result = yield order.createOrder(Object.assign(Object.assign({}, req.body), req.params));
     res.send(result);
 }));
+orders.delete('/deleteOrder/:order_id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order.deleteOrder(req.params.order_id);
+    res.send(result);
+}));
 exports.default = orders;

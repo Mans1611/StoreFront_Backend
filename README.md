@@ -21,31 +21,32 @@ The full endpoint will be:
 /users/[unlisted_item below]
 it is important to implement create the users first to be able to use other api endpoints 
 
-- create : to create user, and it will create token, which will be provided in the response header.
-- index : to get all the users of the store without token.
-- show/id : to get specific user and you have to provide user's token in the request header as token and then proivde that user's token .
-- delete/id : to delete that user with the id, and the user have to provide that user's token to delete it .
-- update/id : to update that user and token must be provided too , it is important to mention that the user can update whatever he wants, so it is flexiable.
+- [POST] create : to create user, and it will create token, which will be provided in the response header.
+-[GET] index : to get all the users of the store without token.
+- [GET] show/id : to get specific user and you have to provide user's token in the request header as token and then proivde that user's token .
+- [DELETE] delete/id : to delete that user with the id, and the user have to provide that user's token to delete it .
+- [PUT]update/id : to update that user and token must be provided too , it is important to mention that the user can update whatever he wants, so it is flexiable.
 -completeOrders/id : it return all completed orders by that user, and token must be provided as well.
 
 ### product : 
 The full endpoint will be: 
 /products/[unlisted_item below]
 it is important to implement create the users first to be able to use other api endpoints 
-- create :  to create a product with the price, category and name, and it must be provided in the requst body. you can just provide any token for any user, so it tokenVerifiy middleware is to maje sure that this user is exisit in the data base.
-- index : to retrive all the products of the store .
-- show/id : to get the specific product and the user must provide a token.
-- category/cat : to get all the same type of the items in the store. 
-- popularProducts : to retrive the top 5 most common items in the store, depends on the quantity sold in the store .
-- update/id : to update that product and the the admin can edit whatever he wants like proce ,name or all of them in once.
-- delete/id : to delete that item from the data base and provide id of that item.
+- [POST] create :  to create a product with the price, category and name, and it must be provided in the requst body. you can just provide any token for any user, so it tokenVerifiy middleware is to maje sure that this user is exisit in the data base.
+- [GET] index : to retrive all the products of the store .
+- [GET] show/id : to get the specific product and the user must provide a token.
+- [GET] category/cat : to get all the same type of the items in the store. 
+- [GET] popularProducts : to retrive the top 5 most common items in the store, depends on the quantity sold in the store .
+- [PUT] update/id : to update that product and the the admin can edit whatever he wants like proce ,name or all of them in once.
+- [DELETE]delete/id : to delete that item from the data base and provide id of that item.
 
 ### orders : 
 The full endpoint will be: 
 /orders/[unlisted_item below]
-- currentOrder/id: you have to provide the user id as params and it will his current orders with it status.
- - createOrder/id : this I have implement it to be able to make order for that user and to creare it.
- - / : this to return all orders in the store.
+- [GET] currentOrder/id: you have to provide the user id as params and it will his current orders with it status.
+ - [POST] createOrder/id : this I have implement it to be able to make order for that user and to creare it.
+ - [GET] / : this to return all orders in the store.
+ - [DELETE] /deleteOrder/:order_id : delete the the order with that id 
 
 
  ## Technolgies used to implement this Project:
@@ -54,6 +55,27 @@ The full endpoint will be:
  - PostgreSQL : as a database for the store
  - JWT : for tokens
  - bcrypt for hashing passwords and (authentication & authorization).
-  
 
 
+## Data Base Schema 
+### Users :
+- user_id [SERIAL]
+- firstname [VARCHAR]
+- lastname [VAARCHAR]
+- password [VARCHAR]
+### Products : 
+- product_id [SERIAL]
+- name [VARCHAR]
+- price [FLOAT]
+- category [VARCHAR]
+
+### Orders :
+- order_id [SERIAL]
+- user_id [SERIAL]
+- status [VARCHAR]
+
+### orderProducts:
+- order_id [SERIAL]
+- product_id [SERIAL]
+- quantity [INT]
+- id [SERIAL]

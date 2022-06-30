@@ -81,7 +81,6 @@ class User {
     create(user) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(process.env.salt);
                 const salt = parseInt(process.env.salt);
                 const hashedPass = bcrypt_1.default.hashSync(user.password, salt);
                 const connection = yield Client_1.default.connect();

@@ -126,7 +126,7 @@ export default class Products{
     }
 
     async deleteProduct(id:String):Promise <string>{
-        const sqlCommand_1 = `DELETE FROM Orders WHERE product_id=($1)`;
+        const sqlCommand_1 = `DELETE FROM orderProducts WHERE product_id=($1)`;
         const sqlCommand_2 = `DELETE FROM Products WHERE product_id=($1)`;
         try{
             const connection = await client.connect();
@@ -137,6 +137,7 @@ export default class Products{
                 await connection.query(sqlCommand_2,[id]);
                 return 'The product is deleted';
             }
+            
             connection.release();
             return ' this product is not exist';
         }catch(err){

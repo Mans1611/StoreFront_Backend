@@ -12,25 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Products_1 = __importDefault(require("../models/Products"));
 const supertest_1 = __importDefault(require("supertest"));
 const server_1 = __importDefault(require("../server"));
-const product = new Products_1.default();
-const request = (0, supertest_1.default)(server_1.default);
-describe("Testing products model ", () => {
-    it('testing defeinition of products', () => {
-        expect(product).toBeDefined();
-    });
-    it("Testing add new Product", () => __awaiter(void 0, void 0, void 0, function* () {
-        const newProduct = yield product.create({
-            name: "rice",
-            category: "food",
-            price: 17.5
-        });
-        expect(newProduct).toBe("done");
-    }));
-    it("updating test", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield request.delete('/products/deleteProduct/6');
-        expect(res.status).toEqual(200);
+const App = (0, supertest_1.default)(server_1.default);
+describe("testing product end point", () => {
+    it("testing status of root products", () => __awaiter(void 0, void 0, void 0, function* () {
+        const status = yield App.get('/products/');
+        expect(status.status).toBe(200);
     }));
 });

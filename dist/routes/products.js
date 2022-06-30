@@ -17,12 +17,14 @@ const tokenVerify_1 = __importDefault(require("../middleware/tokenVerify"));
 const Products_1 = __importDefault(require("../models/Products"));
 const products = express_1.default.Router();
 const product = new Products_1.default();
+products.get('/', (req, res) => {
+    res.status(200).send("Products Section");
+});
 products.get('/index', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield product.index();
     res.send(result);
 }));
 products.get('/show/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.params.id);
     const result = yield product.show(req.params.id);
     res.send(result);
 }));

@@ -127,7 +127,7 @@ class Products {
     }
     deleteProduct(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sqlCommand_1 = `DELETE FROM Orders WHERE product_id=($1)`;
+            const sqlCommand_1 = `DELETE FROM orderProducts WHERE product_id=($1)`;
             const sqlCommand_2 = `DELETE FROM Products WHERE product_id=($1)`;
             try {
                 const connection = yield Client_1.default.connect();

@@ -1,23 +1,12 @@
-import Order,{order_type} from "../models/Order";
-import app from "../server";
+import supertest from "supertest";
 
-const order = new Order();
+import app from '../server'
 
+const App = supertest(app);
 
-describe('Testing orders',()=>{
-    it("testing order defenition",()=>{
-        expect(order).toBeDefined();
+describe("testing orders route",()=>{
+    it("testing orders endpoint",async()=>{
+        const res = await App.get('/orders');
+        expect(res.status).toBe(200);        
     })
-    it("create new order",async()=>{
-        let test_order : order_type = {
-            user_id : '1' ,
-            product_id : '1',
-            product_quantity : 1,
-            status : "Active"
-        } 
-        const res = await order.createOrder(test_order);
-
-        expect(res).toBe("Order is created ");
-    })
-
 })

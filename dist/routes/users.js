@@ -28,7 +28,6 @@ users.get('/index', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 
 }));
 users.get('/show/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user.show(req.params.id);
-    console.log(result);
     if (typeof (result) === 'string') {
         res.status(404).send("this user is not exist");
     }
@@ -51,6 +50,10 @@ users.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const result = yield user.create(req.body);
         // so if it passes from the above line so this means that the user is created, and we need token for this.user;
         const connection = yield Client_1.default.connect();
+        /*
+           the code below is to provide the id of the the user which was created
+           in the token, this will help me to check for another authorization end points
+        */
         const users = (yield connection.query('SELECT user_id FROM users')).rows;
         const { user_id } = users[users.length - 1];
         const token = jsonwebtoken_1.default.sign({

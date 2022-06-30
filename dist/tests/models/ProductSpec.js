@@ -12,14 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Products_1 = __importDefault(require("../../models/Products"));
 const supertest_1 = __importDefault(require("supertest"));
-const Users_1 = __importDefault(require("../models/Users"));
-const server_1 = __importDefault(require("../server"));
-const user = new Users_1.default();
-const App = (0, supertest_1.default)(server_1.default);
-describe("testing users routes", () => {
-    it("testing server", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield App.get('/');
-        expect(res.status).toBe(200);
+const server_1 = __importDefault(require("../../server"));
+const product = new Products_1.default();
+const request = (0, supertest_1.default)(server_1.default);
+describe("Testing products model ", () => {
+    it('testing defeinition of products', () => {
+        expect(product).toBeDefined();
+    });
+    it("testing index", () => __awaiter(void 0, void 0, void 0, function* () {
+        const products_test = yield product.index();
+        expect(0).toEqual([].length);
+    }));
+    it("updating product test", () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield request.delete('/products/deleteProduct/6');
+        expect(res.status).toEqual(200);
     }));
 });

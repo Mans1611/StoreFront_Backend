@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "set NODE_ENV=test && tsc && db-migrate up --env test && tsc && jasmine && db-migrate reset --env test",
+    "test": "set ENV=test&& set PORT=4000&& tsc && db-migrate up --env test && tsc && jasmine && db-migrate reset --env test",
     "start": "nodemon src/server.ts",
     "build": "npx tsc",
-    "jasmine": "jasmine"
+    "jasmine": "jasmine",
+    "migrations": "db-migrate up",
+    "lint":"eslint"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +33,9 @@
     "@types/jsonwebtoken": "^8.5.8",
     "@types/pg": "^8.6.5",
     "@types/supertest": "^2.0.12",
+    "eslint": "^8.18.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
     "jasmine": "^4.2.1",
     "jasmine-spec-reporter": "^7.0.0",
     "jasmine-ts": "^0.4.0",

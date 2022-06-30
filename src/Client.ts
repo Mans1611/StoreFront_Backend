@@ -3,30 +3,29 @@ import dotenv from 'dotenv'
 
 dotenv.config();
 
-const {host,database,username,pass,database_test} = process.env;
+const {host,database,mans_database,user,pass,database_test}=
+ process.env;
 
 let client:Pool ;
 
-console.log(process.env.NODE_ENV);
-if(process.env.NODE_ENV === 'test'){
+
+if(process.env.ENV === 'test'){
     client = new Pool({
         host,
         database :database_test,
-        user:database, // same name
+        user:user, // same name
         password:pass
     });
-    console.log("passed here if ");
     
 }
-
 else{
     client = new Pool({
         host,
-        database,
-        user:database,
+        database:database,
+        user:user,
         password:pass
     });
-    console.log("passed here else");
 }
+
 
 export default client;
