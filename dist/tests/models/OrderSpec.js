@@ -61,7 +61,7 @@ describe('Testing orders', () => {
         expect(order_res).toBe("Order is created");
     }));
     it("deleting order test", () => __awaiter(void 0, void 0, void 0, function* () {
-        const delete_order_test = yield order.deleteOrder("1");
+        const delete_order_test = yield order.deleteOrder("1", "1");
         expect(delete_order_test).toBe("order is deleted");
     }));
     it("testing current order", () => __awaiter(void 0, void 0, void 0, function* () {

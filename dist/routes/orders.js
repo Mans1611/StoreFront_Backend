@@ -21,16 +21,22 @@ orders.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order.getAll();
     res.send(result);
 }));
-orders.get('/currentOrder/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+orders.get('/currentOrder/:user_id/:order_id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order.currentOrder(req);
     res.send(result);
 }));
 orders.post('/create/:user_id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const payload = JSON.parse(req.headers.payload);
+    if (payload.user_id != req.params.user_id)
+        return res.status(402).send('this token is not for this user');
     const result = yield order.createOrder(Object.assign(Object.assign({}, req.body), req.params));
     res.send(result);
 }));
-orders.delete('/deleteOrder/:order_id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order.deleteOrder(req.params.order_id);
-    res.send(result);
+orders.delete('/deleteOrder/:order_id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const payload = JSON.parse(req.headers.payload);
+    console.log(payload);
+    console.log(payload.user_id);
+    const result = yield order.deleteOrder(req.params.order_id, payload.user_id);
+    return res.status(200).send(result);
 }));
 exports.default = orders;

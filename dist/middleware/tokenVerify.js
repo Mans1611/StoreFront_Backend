@@ -7,7 +7,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const tokenVerify = (req, res, next) => {
-    if (req.headers.token === "") {
+    if (req.headers.token === "" || !req.headers.token) {
         res.send("provide a token");
     }
     else {

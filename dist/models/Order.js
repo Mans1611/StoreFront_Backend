@@ -30,17 +30,26 @@ class Order {
     }
     currentOrder(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sqlCommand = `SELECT Orders.user_id, Orders.status, Orders.order_id,orderProducts.quantity,orderProducts.product_id FROM Orders INNER JOIN orderProducts ON Orders.order_id = orderProducts.order_id WHERE Orders.user_id=($1)`;
+            const sqlCommand = `SELECT  orderProducts.quantity,orderProducts.product_id,Products.name FROM Orders 
+        JOIN orderProducts ON Orders.order_id = orderProducts.order_id Join Products ON orderProducts.product_id = Products.product_id  WHERE (Orders.user_id=($1)) AND (Orders.order_id=($2))`;
+            // WHERE [condition1] AND [condition2]...AND [conditionN]
             try {
                 const connection = yield Client_1.default.connect();
-                const result = yield connection.query(sqlCommand, [req.params.id]);
+                const result = yield connection.query(sqlCommand, [req.params.user_id, req.params.order_id]);
                 connection.release();
                 const payload = JSON.parse(req.headers.payload);
-                if (payload.user_id != req.params.id)
+                if (payload.user_id != req.params.user_id)
                     return 'this token is not for this id';
-                if (result.rowCount > 0)
-                    return result.rows;
-                return 'there is now orders';
+                if (result.rowCount > 0) {
+                    let user_order = {
+                        user_id: req.params.user_id,
+                        order_id: req.params.order_id,
+                        status: result.rows[0].status,
+                        product_details: result.rows,
+                    };
+                    return user_order;
+                }
+                return 'there is no orders';
             }
             catch (err) {
                 console.log(err);
@@ -59,10 +68,17 @@ class Order {
                 yield connection.query(sqlCommand, [order.user_id, order.status]);
                 const orderes = (yield connection.query('SELECT order_id FROM Orders')).rows;
                 const { order_id } = orderes[orderes.length - 1];
+                // this for loop for adding many products in the same order 
                 for (let i = 0; i < product_id_list.length; i++) {
                     const product_quantity = parseInt(product_quantity_list[i]); //to convert it to number
                     const product_id = parseInt(product_id_list[i]);
-                    yield connection.query(sqlCommand_2, [order_id, product_id, product_quantity]);
+                    try {
+                        yield connection.query(sqlCommand_2, [order_id, product_id, product_quantity]);
+                    }
+                    catch (err) {
+                        console.log(err);
+                        return 'check the product id again';
+                    }
                 }
                 return "Order is created";
             }
@@ -72,16 +88,27 @@ class Order {
             }
         });
     }
-    deleteOrder(order_id) {
+    deleteOrder(order_id, user_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sqlCommand = `DELETE FROM orderProducts WHERE order_id=($1)`;
-            const sqlCommand_2 = `DELETE FROM Orders WHERE order_id=($1)`;
+            const sqlCommandVerify = `SELECT order_id,user_id FROM Orders WHERE order_id=($1)`;
             try {
                 const connection = yield Client_1.default.connect();
-                yield connection.query(sqlCommand, [order_id]);
-                yield connection.query(sqlCommand_2, [order_id]);
+                const order = yield connection.query(sqlCommandVerify, [order_id]);
+                if (order.rowCount == 0)
+                    return 'this order is not exist to delete';
+                /* this condition just to verify that the user_id in the token is the same as the user_id in the order type
+                    as a result the user can just remove his orders
+                */
+                if (order.rows[0].user_id == user_id) {
+                    const sqlCommand = `DELETE FROM orderProducts WHERE order_id=($1)`;
+                    const sqlCommand_2 = `DELETE FROM Orders WHERE order_id=($1)`;
+                    yield connection.query(sqlCommand, [order_id]);
+                    yield connection.query(sqlCommand_2, [order_id]);
+                    connection.release();
+                    return 'order is deleted';
+                }
                 connection.release();
-                return 'order is deleted';
+                return 'this order is not for this user';
             }
             catch (err) {
                 console.log(err);

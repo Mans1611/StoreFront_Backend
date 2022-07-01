@@ -69,12 +69,19 @@ class Products {
     }
     popularProducts() {
         return __awaiter(this, void 0, void 0, function* () {
-            const sqlCommand = `SELECT name,SUM(product_quantity) AS quantity FROM Products INNER JOIN Orders ON Products.product_id=Orders.product_id GROUP BY (Orders.product_id,Products.name) ORDER BY SUM(product_quantity) DESC LIMIT 5`;
-            const connection = yield Client_1.default.connect();
-            const result = yield connection.query(sqlCommand);
-            if (result.rowCount > 1)
-                return result.rows;
-            return 'There is no orders yet ';
+            const sqlCommand = `SELECT name,SUM(quantity) AS "NUMBER OF ITEMS SOLD" FROM Products INNER JOIN orderProducts ON Products.product_id=orderProducts.product_id 
+                            GROUP BY (orderProducts.product_id,Products.name) ORDER BY SUM(quantity) DESC LIMIT 5`;
+            try {
+                const connection = yield Client_1.default.connect();
+                const result = yield connection.query(sqlCommand);
+                if (result.rowCount > 1)
+                    return result.rows;
+                return 'There is no orders yet ';
+            }
+            catch (err) {
+                console.log(err);
+                return 'there is an error in popular roducts';
+            }
         });
     }
     category(cat) {

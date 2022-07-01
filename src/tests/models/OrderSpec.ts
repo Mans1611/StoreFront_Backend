@@ -57,7 +57,7 @@ describe('Testing orders',()=>{
     });
     
     it("deleting order test", async()=>{
-        const delete_order_test = await order.deleteOrder("1");
+        const delete_order_test = await order.deleteOrder("1","1");
         expect(delete_order_test).toBe("order is deleted");
     })
     it("testing current order",async()=>{

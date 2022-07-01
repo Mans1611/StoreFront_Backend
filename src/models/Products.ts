@@ -63,12 +63,22 @@ export default class Products{
     }
 
     async popularProducts():Promise <product_type[] | string>{
-        const sqlCommand = `SELECT name,SUM(product_quantity) AS quantity FROM Products INNER JOIN Orders ON Products.product_id=Orders.product_id GROUP BY (Orders.product_id,Products.name) ORDER BY SUM(product_quantity) DESC LIMIT 5`;
-        const connection = await client.connect();
-        const result = await connection.query(sqlCommand);
-       if(result.rowCount>1)
+        const sqlCommand = `SELECT name,SUM(quantity) AS "NUMBER OF ITEMS SOLD" FROM Products INNER JOIN orderProducts ON Products.product_id=orderProducts.product_id 
+                            GROUP BY (orderProducts.product_id,Products.name) ORDER BY SUM(quantity) DESC LIMIT 5`;
+        
+        try{
+            const connection = await client.connect();
+            const result = await connection.query(sqlCommand);
+            if(result.rowCount>1)
             return result.rows;
-        return 'There is no orders yet '
+            return 'There is no orders yet '
+
+        }
+        catch(err){
+            console.log(err);
+            return 'there is an error in popular roducts';
+            
+        }
     }
 
 

@@ -11,7 +11,34 @@ This Repo contains storefront REstful Api for storefront  project which is build
 
 Now that you have the structure of the databse outlined, it is time to create the database and migrations. by running 
 
-``db-migrate up``
+# REQUIREMENTS: 
+
+## Installing the pacjages of the Project:
+```sh 
+npm install 
+```
+
+## Database setup
+
+### CREATE USER 
+
+```sh 
+CREATE USER mans1611 PASSWORD 'mans';
+ALTER USER mans1611 WITH SUPERUSER;
+GRANT postgres TO mans1611;
+```
+
+## database port : 5432
+
+### Before Launching the app you have to migrate the database in the rootfolder of the project
+
+```sh
+db-migtare up 
+```
+
+```shel
+db-migrate up
+```
 
 to create migrations  
 
@@ -43,7 +70,7 @@ it is important to implement create the users first to be able to use other api 
 ### orders : 
 The full endpoint will be: 
 /orders/[unlisted_item below]
-- [GET] currentOrder/id: you have to provide the user id as params and it will his current orders with it status.
+- [GET] currentOrder/:user_id/:order_id : you have to provide the user id as params and it will his current orders with it status.
  - [POST] createOrder/id : this I have implement it to be able to make order for that user and to creare it.
  - [GET] / : this to return all orders in the store.
  - [DELETE] /deleteOrder/:order_id : delete the the order with that id 
@@ -79,3 +106,16 @@ The full endpoint will be:
 - product_id [SERIAL]
 - quantity [INT]
 - id [SERIAL]
+
+# ENV variables:
+### database=project_db
+### mans_database=postgres
+### user=mans1611
+### pass=mans
+### POSTG_HOST=127.0.0.1
+### ENV=dev
+### salt=5
+### bcrypt=mans
+### jwt=passJWT
+### database_test=project_test
+### PORT=5000

@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config();
 
 const tokenVerify = (req:Request,res:Response,next:Function)=>{
-   if(req.headers.token === ""){
+   if(req.headers.token === "" || !req.headers.token){
     res.send("provide a token");
     }else{
         try{
