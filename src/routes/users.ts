@@ -4,12 +4,17 @@ import User, { user_type } from '../models/Users';
 import dotenv from 'dotenv';
 import tokenVerify from '../middleware/tokenVerify';
 import client from '../Client';
+import asignUserIDToToken from '../models/postCreatingUser';
 const users = express.Router();
 const user = new User();
 
 dotenv.config()
 
 // so the token must be provided in the header of the request
+users.get("/",(req:Request,res:Response)=>{
+    res.status(200).send("this is users route")
+
+})
 users.get('/index', tokenVerify,async (req:Request,res:Response)=>{
     const result = await user.index();
     res.json(result);
@@ -42,33 +47,31 @@ users.get('/completeOrder/:id',tokenVerify,async (req:Request,res:Response)=>{
 
 users.post('/create',async (req:Request,res:Response)=>{
     try{
+
+        // to check validation of the the body.
+        const {firstname,lastname,password} = req.body;
+        if(!firstname || !lastname)
+            return res.status(401).send("the body is incorrect you  must provide firstname & lastname");
+        if(!password)
+            return res.status(400).send("provide a password in the body please");
+
+        const token = await asignUserIDToToken(req);
+        res.setHeader("tokenValue",token as string);
         const result = await user.create((req.body as unknown) as user_type); 
         // so if it passes from the above line so this means that the user is created, and we need token for this.user;
-        const  connection = await client.connect();
-        
-        /* 
-           the code below is to provide the id of the the user which was created
-           in the token, this will help me to check for another authorization end points
-        */
-        const users =  (await connection.query('SELECT user_id FROM users')).rows;
-        const {user_id} = users[users.length-1];  
-        const token = jwt.sign(
-            {
-                firstName:req.body.firstname,
-                lastName:req.body.lastname,
-                user_id},process.env.jwt as string);
-
-        res.setHeader("tokenvalue",token); // i sent the token value in response header. 
-        
         
         res.status(201).send(result);
     }catch(err){
         console.log(err);
-        
+        return "Can't create this user, try again later";
     }
     
 })
 users.put('/update/:id',tokenVerify,async(req:Request,res:Response)=>{
+    const {firstname,lastname,password} = req.body;
+    if(!firstname && !lastname && !password)
+        return res.status(400).send("you have to update at leaset one field: firstname,lastname or password");
+
     const result = await user.updateUser(req);
     res.send(result);
 })

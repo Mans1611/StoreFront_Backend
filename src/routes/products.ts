@@ -30,10 +30,17 @@ products.get('/popularProducts',async (req:Request,res:Response)=>{
 })
 
 products.post('/create',tokenVerify,async (req:Request,res:Response)=>{
+    const {name, price, category} = req.body;
+    if(!name || !price || !category)
+        return res.status(400).send("provide a full body to create this product name,price and category");
+    
     const result = await product.create(req.body);
     res.status(201).send(result);
 })
 products.put('/update/:id',async(req:Request,res:Response)=>{
+    const {name, price, category} = req.body;
+    if(!name && !price && !category)
+        return res.status(400).send("you have to update at least on field for this product");
     const result = await product.updateProduct(req);
     res.send(result)
 })

@@ -84,7 +84,7 @@ class User {
                 const salt = parseInt(process.env.salt);
                 const hashedPass = bcrypt_1.default.hashSync(user.password, salt);
                 const connection = yield Client_1.default.connect();
-                const sqlCommand = `INSERT INTO Users (firstName,lastName,password) VALUES($1,$2,$3)`;
+                const sqlCommand = `INSERT INTO Users (firstname,lastname,password) VALUES($1,$2,$3)`;
                 yield connection.query(sqlCommand, [user.firstname, user.lastname, hashedPass]);
                 connection.release();
                 return "user is created";

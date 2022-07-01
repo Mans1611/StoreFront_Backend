@@ -80,11 +80,10 @@ export default class User {
 
     async create(user:user_type):Promise<string>{
         try{
-           
             const salt = parseInt(process.env.salt as string);
-            const hashedPass = bcrypt.hashSync(user.password as string ,salt);
+            const hashedPass = bcrypt.hashSync(user.password as string,salt);
             const connection = await client.connect();
-            const sqlCommand = `INSERT INTO Users (firstName,lastName,password) VALUES($1,$2,$3)`;
+            const sqlCommand = `INSERT INTO Users (firstname,lastname,password) VALUES($1,$2,$3)`;
             await connection.query(sqlCommand,[user.firstname,user.lastname,hashedPass]);
             connection.release();
             return "user is created"

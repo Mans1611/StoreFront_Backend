@@ -37,10 +37,16 @@ products.get('/popularProducts', (req, res) => __awaiter(void 0, void 0, void 0,
     res.send(result);
 }));
 products.post('/create', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, price, category } = req.body;
+    if (!name || !price || !category)
+        return res.status(400).send("provide a full body to create this product name,price and category");
     const result = yield product.create(req.body);
     res.status(201).send(result);
 }));
 products.put('/update/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, price, category } = req.body;
+    if (!name && !price && !category)
+        return res.status(400).send("you have to update at least on field for this product");
     const result = yield product.updateProduct(req);
     res.send(result);
 }));

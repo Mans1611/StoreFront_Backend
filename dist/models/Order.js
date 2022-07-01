@@ -37,6 +37,8 @@ class Order {
                 const connection = yield Client_1.default.connect();
                 const result = yield connection.query(sqlCommand, [req.params.user_id, req.params.order_id]);
                 connection.release();
+                if (!req.headers.payload)
+                    return 'the payload is not provided';
                 const payload = JSON.parse(req.headers.payload);
                 if (payload.user_id != req.params.user_id)
                     return 'this token is not for this id';
@@ -108,11 +110,11 @@ class Order {
                     return 'order is deleted';
                 }
                 connection.release();
-                return 'this order is not for this user';
+                return 'this order is not for this user provide the correct token for this user';
             }
             catch (err) {
                 console.log(err);
-                return 'there is an erro in deleting this order';
+                return 'there is an erro in deleting this order check the order id';
             }
         });
     }

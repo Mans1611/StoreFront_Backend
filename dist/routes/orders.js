@@ -26,6 +26,9 @@ orders.get('/currentOrder/:user_id/:order_id', tokenVerify_1.default, (req, res)
     res.send(result);
 }));
 orders.post('/create/:user_id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { status, product_quantity, product_id } = req.body;
+    if (!status || !product_id || !product_quantity)
+        return res.status(400).send("you have to provide all order requirements status,product_quantity and product_id in the body");
     const payload = JSON.parse(req.headers.payload);
     if (payload.user_id != req.params.user_id)
         return res.status(402).send('this token is not for this user');
@@ -34,8 +37,6 @@ orders.post('/create/:user_id', tokenVerify_1.default, (req, res) => __awaiter(v
 }));
 orders.delete('/deleteOrder/:order_id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = JSON.parse(req.headers.payload);
-    console.log(payload);
-    console.log(payload.user_id);
     const result = yield order.deleteOrder(req.params.order_id, payload.user_id);
     return res.status(200).send(result);
 }));

@@ -13,15 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Users_1 = __importDefault(require("../models/Users"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const tokenVerify_1 = __importDefault(require("../middleware/tokenVerify"));
-const Client_1 = __importDefault(require("../Client"));
+const postCreatingUser_1 = __importDefault(require("../models/postCreatingUser"));
 const users = express_1.default.Router();
 const user = new Users_1.default();
 dotenv_1.default.config();
 // so the token must be provided in the header of the request
+users.get("/", (req, res) => {
+    res.status(200).send("this is users route");
+});
 users.get('/index', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user.index();
     res.json(result);
@@ -47,28 +49,27 @@ users.get('/completeOrder/:id', tokenVerify_1.default, (req, res) => __awaiter(v
 }));
 users.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // to check validation of the the body.
+        const { firstname, lastname, password } = req.body;
+        if (!firstname || !lastname)
+            return res.status(401).send("the body is incorrect you  must provide firstname & lastname");
+        if (!password)
+            return res.status(400).send("provide a password in the body please");
+        const token = yield (0, postCreatingUser_1.default)(req);
+        res.setHeader("tokenValue", token);
         const result = yield user.create(req.body);
         // so if it passes from the above line so this means that the user is created, and we need token for this.user;
-        const connection = yield Client_1.default.connect();
-        /*
-           the code below is to provide the id of the the user which was created
-           in the token, this will help me to check for another authorization end points
-        */
-        const users = (yield connection.query('SELECT user_id FROM users')).rows;
-        const { user_id } = users[users.length - 1];
-        const token = jsonwebtoken_1.default.sign({
-            firstName: req.body.firstname,
-            lastName: req.body.lastname,
-            user_id
-        }, process.env.jwt);
-        res.setHeader("tokenvalue", token); // i sent the token value in response header. 
         res.status(201).send(result);
     }
     catch (err) {
         console.log(err);
+        return "Can't create this user, try again later";
     }
 }));
 users.put('/update/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { firstname, lastname, password } = req.body;
+    if (!firstname && !lastname && !password)
+        return res.status(400).send("you have to update at leaset one field: firstname,lastname or password");
     const result = yield user.updateUser(req);
     res.send(result);
 }));

@@ -15,14 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const server_1 = __importDefault(require("../server"));
 const App = (0, supertest_1.default)(server_1.default);
-describe("testing product end point", () => {
-    it("testing status of root products", () => __awaiter(void 0, void 0, void 0, function* () {
-        const status = yield App.get('/products/');
-        expect(status.status).toBe(200);
-    }));
-    it("testing sending request without a token", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield App.post('/products/create/', (req, res) => {
-        });
-        expect(res.text).toEqual("provide a token"); // as it just a requset 
+describe("testing the users route ", () => {
+    it("testing users route", () => __awaiter(void 0, void 0, void 0, function* () {
+        const user_response = yield App.get("/users/");
+        expect(user_response.text).toEqual("this is users route");
     }));
 });

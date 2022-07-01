@@ -36,6 +36,10 @@ export default class Order{
             const connection = await client.connect();
             const result = await connection.query(sqlCommand,[req.params.user_id,req.params.order_id]);
             connection.release();
+            if(!req.headers.payload)
+                return 'the payload is not provided';
+            
+            
                 const payload = JSON.parse(req.headers.payload as string);
             if(payload.user_id != req.params.user_id)
                 return 'this token is not for this id';
@@ -98,6 +102,7 @@ export default class Order{
             /* this condition just to verify that the user_id in the token is the same as the user_id in the order type
                 as a result the user can just remove his orders
             */
+
             if(order.rows[0].user_id == user_id){
                 const sqlCommand = `DELETE FROM orderProducts WHERE order_id=($1)`;
                 const sqlCommand_2 = `DELETE FROM Orders WHERE order_id=($1)`;
@@ -108,10 +113,10 @@ export default class Order{
             } 
 
             connection.release();
-            return 'this order is not for this user';
+            return 'this order is not for this user provide the correct token for this user';
         }catch(err){
             console.log(err);
-            return 'there is an erro in deleting this order';
+            return 'there is an erro in deleting this order check the order id';
         }
     }
 }

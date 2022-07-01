@@ -12,17 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const supertest_1 = __importDefault(require("supertest"));
-const server_1 = __importDefault(require("../server"));
-const App = (0, supertest_1.default)(server_1.default);
-describe("testing product end point", () => {
-    it("testing status of root products", () => __awaiter(void 0, void 0, void 0, function* () {
-        const status = yield App.get('/products/');
-        expect(status.status).toBe(200);
-    }));
-    it("testing sending request without a token", () => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield App.post('/products/create/', (req, res) => {
-        });
-        expect(res.text).toEqual("provide a token"); // as it just a requset 
-    }));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const Client_1 = __importDefault(require("../Client"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+/*
+           the code below is to provide the id of the the user which was created
+           in the token, this will help me to check for another authorization end points
+*/
+const asignUserIDToToken = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const connection = yield Client_1.default.connect();
+    const users = (yield connection.query('SELECT user_id FROM users')).rows;
+    const { user_id } = users[users.length - 1];
+    const token = jsonwebtoken_1.default.sign({
+        firstName: req.body.firstname,
+        lastName: req.body.lastname,
+        user_id
+    }, process.env.jwt);
+    return token;
 });
+exports.default = asignUserIDToToken;
