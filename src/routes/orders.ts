@@ -27,10 +27,6 @@ orders.post('/create/:user_id',tokenVerify,async(req:Request,res:Response)=>{
 orders.delete('/deleteOrder/:order_id',tokenVerify,async (req:Request,res:Response)=>{
     
     const payload = JSON.parse(req.headers.payload as string);
-    console.log(payload);
-    console.log(payload.user_id);
-    
-    
     const result = await order.deleteOrder(req.params.order_id, payload.user_id);
     return res.status(200).send(result);
 
