@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Client_1 = __importDefault(require("../Client"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const aggregatingQueries_1 = __importDefault(require("../handlers/aggregatingQueries"));
 dotenv_1.default.config();
 class User {
     index() {
@@ -65,11 +66,11 @@ class User {
                 return 'an error occures while authuntication';
             }
             try {
-                const sqlCommand = `SELECT name,Orders.product_id,status FROM Orders INNER JOIN Products ON Products.product_id=Orders.product_id  WHERE user_id=($1) AND status='Complete'`;
+                const sqlCommand = `SELECT name,price,status,Orders.order_id,quantity FROM orderProducts JOIN Orders ON orderProducts.order_id=Orders.order_id JOIN Products ON orderProducts.product_id=Products.product_id  WHERE user_id=($1) AND status='Complete' ORDER BY Orders.order_id ASC`;
                 const result = yield connection.query(sqlCommand, [req.params.id]);
                 connection.release();
                 if (result.rowCount > 0)
-                    return result.rows;
+                    return (0, aggregatingQueries_1.default)(result.rows);
                 return 'this user has no complete orders';
             }
             catch (err) {
@@ -110,19 +111,20 @@ class User {
                 /* the next 3 conditions for giving the user the flexiability to update the wanted feilds
                    not all the fields
                 */
-                if (req.body.firstname !== '') {
+                if (req.body.firstname && req.body.firstname !== "") {
                     const sqlCommand = `UPDATE Users SET firstname=($1) WHERE user_id=($2)`;
-                    const result = yield connection.query(sqlCommand, [req.body.firstname, req.params.id]);
+                    yield connection.query(sqlCommand, [req.body.firstname, req.params.id]);
                 }
-                if (req.body.lastname !== '') {
+                if (req.body.lastname && req.body.lastname !== "") {
                     const sqlCommand = `UPDATE Users SET lastname=($1) WHERE user_id=($2)`;
-                    const result = yield connection.query(sqlCommand, [req.body.lastname, req.params.id]);
+                    yield connection.query(sqlCommand, [req.body.lastname, req.params.id]);
                 }
-                if (req.body.password !== '') {
+                if (req.body.password && req.body.password !== "") {
+                    const salt = parseInt(process.env.salt);
                     const sqlCommand = `UPDATE Users SET password=($1) WHERE user_id=($2)`;
                     // we need to crypt the password before updating it 
-                    const newPass = bcrypt_1.default.hashSync(req.body.password, process.env.salt);
-                    const result = yield connection.query(sqlCommand, [newPass, req.params.id]);
+                    const newPass = bcrypt_1.default.hashSync(req.body.password, salt);
+                    yield connection.query(sqlCommand, [newPass, req.params.id]);
                 }
                 connection.release();
                 return 'updating is over';

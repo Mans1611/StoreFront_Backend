@@ -55,7 +55,8 @@ describe('Testing orders', () => {
             user_id: "1",
             product_id: "2",
             product_quantity: "4",
-            "status": "Active"
+            "status": "Active",
+            order_id: "1"
         };
         const order_res = yield order.createOrder(test_order);
         expect(order_res).toBe("Order is created");

@@ -50,14 +50,15 @@ users.post('/create',async (req:Request,res:Response)=>{
 
         // to check validation of the the body.
         const {firstname,lastname,password} = req.body;
+        
         if(!firstname || !lastname)
             return res.status(401).send("the body is incorrect you  must provide firstname & lastname");
         if(!password)
             return res.status(400).send("provide a password in the body please");
 
-        const token = await asignUserIDToToken(req);
-        res.setHeader("tokenValue",token as string);
-        const result = await user.create((req.body as unknown) as user_type); 
+            const result = await user.create((req.body as unknown) as user_type); 
+            const token = await asignUserIDToToken(req);
+            res.setHeader("tokenValue",token as string);
         // so if it passes from the above line so this means that the user is created, and we need token for this.user;
         
         res.status(201).send(result);

@@ -107,17 +107,18 @@ export default class Products{
             if(typeof(user)==='string')
                 return 'this item is not found';
 
-            if(req.body.name!==''){
-                const sqlCommand = `UPDATE Products SET name=($1) WHERE product_id=($2)`;
-                await connection.query(sqlCommand,[req.body.name,req.params.id]) ;
+            if(req.body.name && req.body.name!==''){
+                    const sqlCommand = `UPDATE Products SET name=($1) WHERE product_id=($2)`;
+                    await connection.query(sqlCommand,[req.body.name,req.params.id]) ;
+                
             }
             
-            if(req.body.price!==''){
+            if(req.body.price!=='' && req.body.price){
                 const price = parseInt(req.body.price); // this to make sure it is a number as in the database
                 const sqlCommand = `UPDATE Products SET price=($1) WHERE product_id=($2)`;
                 await connection.query(sqlCommand,[price,req.params.id]) ;
             }
-            if(req.body.category!==''){
+            if(req.body.category!=='' && req.body.category){
                 const sqlCommand = `UPDATE Products SET category=($1) WHERE product_id=($2)`;
                 await connection.query(sqlCommand,[req.body.category,req.params.id]);
             }

@@ -12,6 +12,8 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const Port = process.env.PORT;
+// bodyParder middleware
+app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded());
 // routes middleware  
 app.use('/products', products_1.default);

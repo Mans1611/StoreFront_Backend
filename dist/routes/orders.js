@@ -21,7 +21,7 @@ orders.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order.getAll();
     res.send(result);
 }));
-orders.get('/currentOrder/:user_id/:order_id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+orders.get('/currentOrder/', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order.currentOrder(req);
     res.send(result);
 }));

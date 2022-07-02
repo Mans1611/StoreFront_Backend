@@ -4,7 +4,9 @@ export type order_type = {
     user_id?:String,
     product_id:String,
     product_quantity:string,
-    status?:String
+    status?:String,
+    order_id:string,
+    product_name?:String
 }
 type products_orders = {
     user_id:String
@@ -28,25 +30,24 @@ export default class Order{
 
     }
     async currentOrder(req:Request):Promise < products_orders | string>{
-        const sqlCommand = `SELECT  orderProducts.quantity,orderProducts.product_id,Products.name FROM Orders 
+        const sqlCommand = `SELECT  orderProducts.quantity,orderProducts.product_id,Orders.status,Products.name FROM Orders 
         JOIN orderProducts ON Orders.order_id = orderProducts.order_id Join Products ON orderProducts.product_id = Products.product_id  WHERE (Orders.user_id=($1)) AND (Orders.order_id=($2))`;
                                                                         // WHERE [condition1] AND [condition2]...AND [conditionN]
         
         try{
             const connection = await client.connect();
-            const result = await connection.query(sqlCommand,[req.params.user_id,req.params.order_id]);
+            const result = await connection.query(sqlCommand,[req.query.user_id,req.query.order_id]);
             connection.release();
             if(!req.headers.payload)
                 return 'the payload is not provided';
-            
-            
-                const payload = JSON.parse(req.headers.payload as string);
-            if(payload.user_id != req.params.user_id)
+
+            const payload = JSON.parse(req.headers.payload as string);
+            if(payload.user_id != req.query.user_id)
                 return 'this token is not for this id';
             if(result.rowCount>0){
                 let user_order:products_orders = {
-                    user_id:req.params.user_id,
-                    order_id : req.params.order_id,
+                    user_id:req.query.user_id as string,
+                    order_id : req.query.order_id as string,
                     status : result.rows[0].status,
                     product_details : result.rows,
                 }

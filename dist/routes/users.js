@@ -55,9 +55,9 @@ users.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(401).send("the body is incorrect you  must provide firstname & lastname");
         if (!password)
             return res.status(400).send("provide a password in the body please");
+        const result = yield user.create(req.body);
         const token = yield (0, postCreatingUser_1.default)(req);
         res.setHeader("tokenValue", token);
-        const result = yield user.create(req.body);
         // so if it passes from the above line so this means that the user is created, and we need token for this.user;
         res.status(201).send(result);
     }

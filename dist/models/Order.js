@@ -30,22 +30,22 @@ class Order {
     }
     currentOrder(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sqlCommand = `SELECT  orderProducts.quantity,orderProducts.product_id,Products.name FROM Orders 
+            const sqlCommand = `SELECT  orderProducts.quantity,orderProducts.product_id,Orders.status,Products.name FROM Orders 
         JOIN orderProducts ON Orders.order_id = orderProducts.order_id Join Products ON orderProducts.product_id = Products.product_id  WHERE (Orders.user_id=($1)) AND (Orders.order_id=($2))`;
             // WHERE [condition1] AND [condition2]...AND [conditionN]
             try {
                 const connection = yield Client_1.default.connect();
-                const result = yield connection.query(sqlCommand, [req.params.user_id, req.params.order_id]);
+                const result = yield connection.query(sqlCommand, [req.query.user_id, req.query.order_id]);
                 connection.release();
                 if (!req.headers.payload)
                     return 'the payload is not provided';
                 const payload = JSON.parse(req.headers.payload);
-                if (payload.user_id != req.params.user_id)
+                if (payload.user_id != req.query.user_id)
                     return 'this token is not for this id';
                 if (result.rowCount > 0) {
                     let user_order = {
-                        user_id: req.params.user_id,
-                        order_id: req.params.order_id,
+                        user_id: req.query.user_id,
+                        order_id: req.query.order_id,
                         status: result.rows[0].status,
                         product_details: result.rows,
                     };

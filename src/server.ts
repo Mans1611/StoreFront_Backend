@@ -9,7 +9,10 @@ dotenv.config();
 
 const app = express();
 const Port = process.env.PORT;
+// bodyParder middleware
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
+
 // routes middleware  
 app.use('/products',products);
 app.use('/users',users);

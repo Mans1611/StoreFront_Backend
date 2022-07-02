@@ -11,7 +11,7 @@ orders.get('/',async (req,res)=>{
 
 })
 
-orders.get('/currentOrder/:user_id/:order_id',tokenVerify,async (req:Request,res:Response)=>{
+orders.get('/currentOrder/',tokenVerify,async (req:Request,res:Response)=>{
     const result = await order.currentOrder(req);
     res.send(result)
 })
@@ -29,6 +29,7 @@ orders.post('/create/:user_id',tokenVerify,async(req:Request,res:Response)=>{
 })
 orders.delete('/deleteOrder/:order_id',tokenVerify,async (req:Request,res:Response)=>{    
     const payload = JSON.parse(req.headers.payload as string);
+
     const result = await order.deleteOrder(req.params.order_id, payload.user_id);
     return res.status(200).send(result);
 

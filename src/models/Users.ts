@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { Request,Response } from "express";
 import { order_type } from "./Order";
+import aggregatingQueries, { completeOrder } from "../handlers/aggregatingQueries";
 export type user_type = {
     user_id?:Number,
     firstname:String,
@@ -46,7 +47,7 @@ export default class User {
         }
    }
 
-    async completeOrder(req:Request):Promise <order_type[] | string>{
+    async completeOrder(req:Request):Promise <completeOrder[] | string>{
         const connection = await client.connect();
         
         try{
@@ -64,11 +65,12 @@ export default class User {
             return 'an error occures while authuntication';
         }
         try{
-            const sqlCommand = `SELECT name,Orders.product_id,status FROM Orders INNER JOIN Products ON Products.product_id=Orders.product_id  WHERE user_id=($1) AND status='Complete'`;
+            const sqlCommand = `SELECT name,price,status,Orders.order_id,quantity FROM orderProducts JOIN Orders ON orderProducts.order_id=Orders.order_id JOIN Products ON orderProducts.product_id=Products.product_id  WHERE user_id=($1) AND status='Complete' ORDER BY Orders.order_id ASC`;
+            
             const result = await connection.query(sqlCommand,[req.params.id])
             connection.release();
             if(result.rowCount>0)
-                return result.rows;
+                return aggregatingQueries(result.rows);
             return 'this user has no complete orders';
         }catch(err){
             console.log(err);
@@ -106,6 +108,7 @@ export default class User {
             const payload = JSON.parse(req.headers.payload as string );
             
             // this below condition is to verify the payload from the token provided 
+            
             if( payload.user_id != user.user_id )
                return 'the token is not for this user';
             
@@ -113,26 +116,24 @@ export default class User {
                not all the fields  
             */ 
 
-            if(req.body.firstname!==''){
+            if(req.body.firstname && req.body.firstname!==""){
                 const sqlCommand = `UPDATE Users SET firstname=($1) WHERE user_id=($2)`;
-                const result = await connection.query(sqlCommand,[req.body.firstname,req.params.id]) ;
-
+                await connection.query(sqlCommand,[req.body.firstname,req.params.id]) ;    
             }
-            if(req.body.lastname!==''){
+            if(req.body.lastname && req.body.lastname!==""){
                 const sqlCommand = `UPDATE Users SET lastname=($1) WHERE user_id=($2)`;
-                const result = await connection.query(sqlCommand,[req.body.lastname,req.params.id]) ;
+                await connection.query(sqlCommand,[req.body.lastname,req.params.id]) ;
             }
-            if(req.body.password!==''){
-                const sqlCommand = `UPDATE Users SET password=($1) WHERE user_id=($2)`;
-                // we need to crypt the password before updating it 
-                const newPass = bcrypt.hashSync(req.body.password,process.env.salt as string);
-                const result = await connection.query(sqlCommand,[newPass,req.params.id]);
+            if(req.body.password && req.body.password!==""){
+                    const salt = parseInt(process.env.salt as string);
+                    const sqlCommand = `UPDATE Users SET password=($1) WHERE user_id=($2)`;
+                    // we need to crypt the password before updating it 
+                    const newPass = bcrypt.hashSync(req.body.password,salt);
+                    await connection.query(sqlCommand,[newPass,req.params.id]);
             }
             connection.release();
-            return 'updating is over'
-               
+            return 'updating is over';
               
-            
         }catch(err){
             console.log(err);
             return 'error while updating processs';

@@ -70,7 +70,7 @@ it is important to implement create the users first to be able to use other api 
 ### orders : 
 The full endpoint will be: 
 /orders/[unlisted_item below]
-- [GET] currentOrder/:user_id/:order_id : you have to provide the user_id  and the order_id as params and it will his current order with its products with it status.
+- [GET] currentOrder/?user_id= {} & order_id={} : you have to provide the user_id  and the order_id as params and it will his current order with its products with it status.
 - [POST] createOrder/id : this I have implement it to be able to make order for that user and to creare it.
 - [GET] / : this to return all orders in the store.
 - [DELETE] /deleteOrder/:order_id : delete the the order with that id 

@@ -13,6 +13,7 @@ const asignUserIDToToken  = async (req:Request):Promise<String>=>{
         const connection = await client.connect();
          const users =  (await connection.query('SELECT user_id FROM users')).rows;
          const {user_id} = users[users.length-1];  
+         
          const token = jwt.sign(
              {
                  firstName:req.body.firstname,
