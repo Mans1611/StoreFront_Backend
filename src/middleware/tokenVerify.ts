@@ -5,7 +5,7 @@ dotenv.config();
 
 const tokenVerify = (req:Request,res:Response,next:Function)=>{
    if(req.headers.token === "" || !req.headers.token){
-    res.send("provide a token");
+    res.status(400).send("provide a token");
     }else{
         try{
             const verify = jwt.verify(req.headers.token as string, process.env.jwt as string);

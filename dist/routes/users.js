@@ -25,36 +25,54 @@ users.get("/", (req, res) => {
     res.status(200).send("this is users route");
 });
 users.get('/index', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user.index();
-    res.json(result);
+    try {
+        const result = yield user.index();
+        res.json(result);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(400).send("an error occured while fetting users");
+    }
 }));
 users.get('/show/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user.show(req.params.id);
-    if (typeof (result) === 'string') {
-        res.status(404).send("this user is not exist");
-    }
-    else {
-        const payload = JSON.parse(req.headers.payload);
-        if (payload.user_id === result.user_id)
-            res.status(200).send(result);
-        else {
-            // if the user data in the database do not match the one in the token
-            res.status(404).send("Check the token again");
+    try {
+        const result = yield user.show(req.params.id);
+        if (typeof (result) === 'string') {
+            res.status(404).send("this user is not exist");
         }
+        else {
+            const payload = JSON.parse(req.headers.payload);
+            if (payload.user_id === result.user_id)
+                res.status(200).send(result);
+            else {
+                // if the user data in the database do not match the one in the token
+                res.status(404).send("Check the token again");
+            }
+        }
+    }
+    catch (err) {
+        console.log(err);
+        res.status(400).send("an error occured while indexing this user");
     }
 }));
 users.get('/completeOrder/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user.completeOrder(req);
-    res.send(result);
+    try {
+        const result = yield user.completeOrder(req);
+        res.send(result);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(400).send(err);
+    }
 }));
 users.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // to check validation of the the body.
+    const { firstname, lastname, password } = req.body;
+    if (!firstname || !lastname)
+        return res.status(401).send("the body is incorrect you  must provide firstname & lastname");
+    if (!password)
+        return res.status(400).send("provide a password in the body please");
     try {
-        // to check validation of the the body.
-        const { firstname, lastname, password } = req.body;
-        if (!firstname || !lastname)
-            return res.status(401).send("the body is incorrect you  must provide firstname & lastname");
-        if (!password)
-            return res.status(400).send("provide a password in the body please");
         const result = yield user.create(req.body);
         const token = yield (0, postCreatingUser_1.default)(req);
         res.setHeader("tokenValue", token);
@@ -63,15 +81,21 @@ users.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     catch (err) {
         console.log(err);
-        return "Can't create this user, try again later";
+        res.status(400).send("an error occured while creating this user");
     }
 }));
 users.put('/update/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstname, lastname, password } = req.body;
     if (!firstname && !lastname && !password)
         return res.status(400).send("you have to update at leaset one field: firstname,lastname or password");
-    const result = yield user.updateUser(req);
-    res.send(result);
+    try {
+        const result = yield user.updateUser(req);
+        res.send(result);
+    }
+    catch (err) {
+        console.log(err);
+        res.send(err);
+    }
 }));
 users.delete('/delete/:id', tokenVerify_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -79,8 +103,7 @@ users.delete('/delete/:id', tokenVerify_1.default, (req, res) => __awaiter(void 
         res.status(200).send(result);
     }
     catch (err) {
-        console.log(err);
-        return 'can not delet this person';
+        res.send(err);
     }
 }));
 exports.default = users;

@@ -8,7 +8,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const tokenVerify = (req, res, next) => {
     if (req.headers.token === "" || !req.headers.token) {
-        res.send("provide a token");
+        res.status(400).send("provide a token");
     }
     else {
         try {

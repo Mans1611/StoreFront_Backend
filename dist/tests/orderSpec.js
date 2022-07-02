@@ -16,8 +16,22 @@ const supertest_1 = __importDefault(require("supertest"));
 const server_1 = __importDefault(require("../server"));
 const App = (0, supertest_1.default)(server_1.default);
 describe("testing orders route", () => {
-    it("testing orders endpoint", () => __awaiter(void 0, void 0, void 0, function* () {
+    it("testing first endpoint", () => __awaiter(void 0, void 0, void 0, function* () {
         const res = yield App.get('/orders');
         expect(res.status).toBe(200);
+    }));
+    // testing current order
+    it("testing ocurrent order", () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield App.get('/orders/currentOrder/?user_id=1');
+        expect(res.text).toEqual("provide a token");
+    }));
+    // testing creating order
+    it("testing creating endpoint", () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield App.post('/orders/create/1');
+        expect(res.text).toEqual("provide a token");
+    }));
+    it("testing deleting end point", () => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield App.delete('/orders/deleteOrder/18');
+        expect(res.status).toBe(400);
     }));
 });

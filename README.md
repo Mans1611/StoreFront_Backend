@@ -28,7 +28,7 @@ ALTER USER mans1611 WITH SUPERUSER;
 GRANT postgres TO mans1611;
 ```
 
-## database port : 5432
+## database server port : 5432
 
 ### Before Launching the app you have to migrate the database in the rootfolder of the project
 
@@ -53,7 +53,7 @@ it is important to implement create the users first to be able to use other api 
 - [GET] show/id : to get specific user and you have to provide user's token in the request header as token and then proivde that user's token .
 - [DELETE] delete/id : to delete that user with the id, and the user have to provide that user's token to delete it .
 - [PUT]update/id : to update that user and token must be provided too , it is important to mention that the user can update whatever he wants, so it is flexiable.
--completeOrders/id : it return all completed orders by that user, and token must be provided as well.
+-[GET]completeOrders/id : it return all completed orders by that user, and token must be provided as well.
 
 ### product : 
 The full endpoint will be: 
