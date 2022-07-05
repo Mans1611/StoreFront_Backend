@@ -16,10 +16,6 @@ jobs:
           name: Mansour is testing
           command: |
             echo "hello mans"
-      - run : 
-          name: testing another script
-          command: | 
-              cd reactnd-contacts-complete && npm install
       - run: 
           name: runing server 
           command: | 
